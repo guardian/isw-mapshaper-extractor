@@ -1,0 +1,22 @@
+{
+  "name": "isw-mapshaper-extractor",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "adm-zip": "^0.5.9",
+    "aws-sdk": "^2.1111.0",
+    "mailparser": "^3.5.0",
+    "mapshaper": "^0.5.118",
+    "path": "^0.12.7"
+  },
+  "config": {
+    "function_name": "isw-mapshaper-extractor"
+  },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC"
+}
