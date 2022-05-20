@@ -31,7 +31,7 @@ const upload = async (body, filename, params = {}) => {
   
   let defaultParams = {
     Bucket: 'isw-extracted-email-attachments-use1',
-    ACL: 'public-read',
+    // ACL: 'public-read',
     // ContentType: 'application/json',
     // CacheControl: 'max-age=3'
   }
@@ -72,7 +72,7 @@ export async function handler(event) {
     const fileNameBase = fs.readdirSync(`/tmp/extracted/${i}/`)[0].split('.')[0]
     console.log(`converting ${fileNameBase}.shp to geojson and topojson...`)
     await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% -o format=topojson /tmp/extracted/${i}/${fileNameBase}_topo.json`)
-    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 80% -o format=geojson /tmp/extracted/${i}/${fileNameBase}_geo.json`)
+    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% -o format=geojson /tmp/extracted/${i}/${fileNameBase}_geo.json`)
 
     // listFiles(`/tmp/extracted/${i}/`)
 
@@ -87,7 +87,7 @@ export async function handler(event) {
 
     await upload(geojsonShape, `${fileNameBase}_geo.json`)
     await upload(topojsonShape, `${fileNameBase}_topo.json`)
-  }
+  } 
 
 
 
