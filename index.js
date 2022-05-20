@@ -26,13 +26,16 @@ const writeFile = (name, data) => new Promise((resolve, reject) => {
 });
 
 const upload = async (body, filename, params = {}) => {
+  
+  
+  
   let defaultParams = {
     Bucket: 'isw-extracted-email-attachments-use1',
     ACL: 'public-read',
-    ContentType: 'application/json',
-    CacheControl: 'max-age=3'
+    // ContentType: 'application/json',
+    // CacheControl: 'max-age=3'
   }
-
+  
   let uploadParams = {
     ...defaultParams,
     ...params,
@@ -68,19 +71,22 @@ export async function handler(event) {
 
     const fileNameBase = fs.readdirSync(`/tmp/extracted/${i}/`)[0].split('.')[0]
     console.log(`converting ${fileNameBase}.shp to geojson and topojson...`)
-    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% -o format=topojson /tmp/extracted/${i}/${fileNameBase}.topojson`)
-    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 80% -o format=geojson /tmp/extracted/${i}/${fileNameBase}.geojson`)
+    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% -o format=topojson /tmp/extracted/${i}/${fileNameBase}_topo.json`)
+    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 80% -o format=geojson /tmp/extracted/${i}/${fileNameBase}_geo.json`)
 
     // listFiles(`/tmp/extracted/${i}/`)
 
     console.log('Now uploading to s3...')
 
-    const geojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}.geojson`)
-    const topojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}.topojson`)
+    const geojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}_geo.json`, 'utf8')
+    const topojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}_topo.json`, 'utf8')
 
-    await upload(geojsonShape, `${fileNameBase}.geojson`)
-    await upload(topojsonShape, `${fileNameBase}.topojson`)
+    const stringGeo = JSON.stringify(geojsonShape)
+    const stringTopo = JSON.stringify(geojsonShape)
 
+
+    await upload(geojsonShape, `${fileNameBase}_geo.json`)
+    await upload(topojsonShape, `${fileNameBase}_topo.json`)
   }
 
 
