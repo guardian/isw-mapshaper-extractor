@@ -46,7 +46,7 @@ const upload = async (body, filename, params = {}) => {
 
 
 export async function handler(event) {
-  
+
   const eventBucket = event['Records'][0]['s3']['bucket']['name']
   const eventKey = event['Records'][0]['s3']['object']['key']
 
@@ -77,8 +77,8 @@ export async function handler(event) {
     const topojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}_topo.json`, 'utf8')
     const rewoundGeojson = JSON.stringify(rewind(JSON.parse(geojsonShape), true))
 
-    await upload(rewoundGeojson, `${fileNameBase}_geo.geojson`)
-    await upload(topojsonShape, `${fileNameBase}_topo.json`)
+    await upload(rewoundGeojson, `geojson/${fileNameBase}.geojson`)
+    await upload(topojsonShape, `topojson/${fileNameBase}_topo.json`)
   } 
 
   const response = {
