@@ -1,4 +1,4 @@
-# zip -r ./isw-mapshaper-extractor-archive.zip ./node_modules
+zip -r ./isw-mapshaper-extractor-archive.zip ./node_modules
 zip -g isw-mapshaper-extractor-archive.zip index.js
 zip -g isw-mapshaper-extractor-archive.zip package.json
 zip -g isw-mapshaper-extractor-archive.zip package-lock.json

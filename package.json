@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
+    "@mapbox/geojson-rewind": "^0.5.2",
     "adm-zip": "^0.5.9",
     "aws-sdk": "^2.1111.0",
     "mailparser": "^3.5.0",

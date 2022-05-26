@@ -2,7 +2,8 @@ import AWS from 'aws-sdk'
 import { simpleParser } from 'mailparser'
 import fs from 'fs'
 import admzip from 'adm-zip'
-import mapshaper from 'mapshaper';
+import mapshaper from 'mapshaper'
+import rewind from '@mapbox/geojson-rewind'
 
 const s3 = new AWS.S3()
 
@@ -26,14 +27,11 @@ const writeFile = (name, data) => new Promise((resolve, reject) => {
 });
 
 const upload = async (body, filename, params = {}) => {
-  
-  
-  
   let defaultParams = {
     Bucket: 'isw-extracted-email-attachments-use1',
     // ACL: 'public-read',
-    // ContentType: 'application/json',
-    // CacheControl: 'max-age=3'
+    ContentType: 'application/json',
+    CacheControl: 'max-age=3'
   }
   
   let uploadParams = {
@@ -48,10 +46,9 @@ const upload = async (body, filename, params = {}) => {
 
 
 export async function handler(event) {
-
+  
   const eventBucket = event['Records'][0]['s3']['bucket']['name']
   const eventKey = event['Records'][0]['s3']['object']['key']
-
 
   const data = await s3.getObject({Bucket: eventBucket, Key: eventKey}).promise()
   const contents = data['Body'].toString("utf-8")
@@ -71,27 +68,18 @@ export async function handler(event) {
 
     const fileNameBase = fs.readdirSync(`/tmp/extracted/${i}/`)[0].split('.')[0]
     console.log(`converting ${fileNameBase}.shp to geojson and topojson...`)
-    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% -o format=topojson /tmp/extracted/${i}/${fileNameBase}_topo.json`)
-    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% -o format=geojson /tmp/extracted/${i}/${fileNameBase}_geo.json`)
-
-    // listFiles(`/tmp/extracted/${i}/`)
+    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% keep-shapes -clean -o format=topojson /tmp/extracted/${i}/${fileNameBase}_topo.json`)
+    await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 75% keep-shapes -clean -o format=geojson /tmp/extracted/${i}/${fileNameBase}_geo_torewind.geojson`)
 
     console.log('Now uploading to s3...')
 
-    const geojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}_geo.json`, 'utf8')
+    const geojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}_geo_torewind.geojson`, 'utf8')
     const topojsonShape = fs.readFileSync(`/tmp/extracted/${i}/${fileNameBase}_topo.json`, 'utf8')
+    const rewoundGeojson = JSON.stringify(rewind(JSON.parse(geojsonShape), true))
 
-    const stringGeo = JSON.stringify(geojsonShape)
-    const stringTopo = JSON.stringify(geojsonShape)
-
-
-    await upload(geojsonShape, `${fileNameBase}_geo.json`)
+    await upload(rewoundGeojson, `${fileNameBase}_geo.geojson`)
     await upload(topojsonShape, `${fileNameBase}_topo.json`)
   } 
-
-
-
-
 
   const response = {
     statusCode: 200,
