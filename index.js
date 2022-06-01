@@ -8,7 +8,7 @@ import rewind from '@mapbox/geojson-rewind'
 const s3 = new AWS.S3()
 
 const timeStamp = new Date()
-const date = timeStamp.toLocaleString('en-GB', { timeZone: 'Europe/London' }).split(",")[0]
+const date = timeStamp.toLocaleString('en-GB', { timeZone: 'US/Eastern' }).split(",")[0]
 const toUpload = date.replaceAll("/", "-")
 
 const listFiles = (folder) => fs.readdirSync(folder).forEach(file => {
