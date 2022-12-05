@@ -122,6 +122,16 @@ function sortFunction(a, b) {
   }
 }
 
+function sortDirs(a, b) {
+  const aDate = a.Key.replace(/\/$/, "")
+  const bDate = b.Key.replace(/\/$/, "")
+  const aDateArr = aDate.split("_")
+  const bDateArr = bDate.split("_")
+  const aDateStr = new Date(`${aDateArr[1]}-${aDateArr[0]}-${aDateArr[2]}`)
+  const bDateStr = new Date(`${bDateArr[1]}-${bDateArr[0]}-${bDateArr[2]}`)
+  return aDateStr < bDateStr ? 1 : -1;
+}
+
 function getS3Data(marker, html) {
   var s3_rest_url = createS3QueryUrl(marker);
   // set loading notice
@@ -139,8 +149,9 @@ function getS3Data(marker, html) {
       // See url for example:
       // http://esp-link.s3-website-us-east-1.amazonaws.com/
       if (S3B_SORT != 'DEFAULT') {
+        console.log(info.directories, 'directories')
         info.files.sort(sortFunction);
-        info.directories.sort(sortFunction);
+        info.directories.sort(sortDirs);
       }
 
       buildNavigation(info);

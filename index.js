@@ -66,7 +66,7 @@ export async function handler(event) {
     const zip = new admzip('/tmp/attach/' + i + '.zip')
     zip.extractAllTo(`/tmp/extracted/${i}/`, false)
 
-    const fileNameBase = fs.readdirSync(`/tmp/extracted/${i}/`)[0].split('.')[0]
+    const fileNameBase = fs.readdirSync(`/tmp/extracted/${i}/`)[0].split('.')[0].replaceAll(" ", "_")
     console.log(`converting ${fileNameBase}.shp to geojson and topojson...`)
     await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 10% keep-shapes -clean -o format=topojson /tmp/extracted/${i}/${fileNameBase}_topo.json`)
     await mapshaper.runCommands(`/tmp/extracted/${i}/*.shp -proj wgs84 -simplify 75% keep-shapes -clean -o format=geojson /tmp/extracted/${i}/${fileNameBase}_geo_torewind.geojson`)
