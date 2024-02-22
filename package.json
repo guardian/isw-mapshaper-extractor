@@ -7,7 +7,7 @@
     "adm-zip": "^0.5.9",
     "aws-sdk": "^2.1111.0",
     "mailparser": "^3.5.0",
-    "mapshaper": "^0.5.118",
+    "mapshaper": "^0.6.44",
     "path": "^0.12.7"
   },
   "config": {
